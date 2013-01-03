@@ -3,18 +3,23 @@
 <head>
     <meta charset="utf-8" />
     <title>costdistance.js</title>
-    <!-- <link rel="stylesheet" type="text/css" href="css/style.css" /> -->
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" />
+    <![endif]-->
     <!--[if IE]></span>
         <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 
-<body id="home">
+<body>
+  <div id="map"></map>
 
-  <h1>costdistance.js</h1>
-  <p>It's in the console...</p>
-
+  <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet-src.js"></script>
   <script src="lib/minheap.js"></script>
+  <script src="lib/GlobalMapTiles.js"></script>
   <script src="js/costdistance.js"></script>
+  <script src="js/map.js"></script>
 </body>
 </html>

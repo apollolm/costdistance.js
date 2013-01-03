@@ -20,8 +20,8 @@ var CostDistance = CostDistance || {};
   };
 
   C.calculate = function(costRaster, sourceRaster, maxCost) {
-    var rowCnt = sourceRaster.length,
-        colCnt = sourceRaster[0].length,
+    var rowCnt = costRaster.length,
+        colCnt = costRaster[0].length,
 
         costDistanceRaster = [],
 
@@ -137,6 +137,8 @@ var CostDistance = CostDistance || {};
           }
         }
       }
+
+      // console.log(heap.size());
     }
 
     return costDistanceRaster;
