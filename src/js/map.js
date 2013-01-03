@@ -100,41 +100,51 @@ function draw(img, canvas, sourcePixel) {
 
   var ctx = canvas.getContext('2d'),
       imageData = getImageData(img),
-      size = imageData.width;
+      size = imageData.width,
+      data = imageData.data,
+      costRaster = [],
+      cdData = [],
+      sourceRaster = to2D([], size),
+      maxCost = 4000,
+      row, col, i, n,
+      red, green, blue, alpha, pixel,
+      costDistance, cdImageData;
 
   canvas.width = size;
   canvas.height = size;
 
-  var data = imageData.data;
-
-  var costRaster = [],
-      sourceRaster = to2D([], size);
-
   sourceRaster[sourcePixel.y][sourcePixel.x] = 1;
 
-
-  // quickly iterate over all pixels
-  var row = -1;
-  for(var i = 0, n = data.length; i < n; i += 4) {
-    var red = data[i],
-        green = data[i + 1],
-        blue = data[i + 2],
-        alpha = data[i + 3],
-        pixel = (i / 4);
-
+  row = -1;
+  for(i = 0, n = data.length; i < n; i += 4) {
+    red = data[i],
+    green = data[i + 1],
+    blue = data[i + 2],
+    alpha = data[i + 3],
+    pixel = (i / 4);
 
     if (pixel % size === 0) {
       row++;
       costRaster[row] = [];
     }
 
-    costRaster[row][pixel - (row * 255)] = blue;
-
+    costRaster[row][pixel - (row * 256)] = blue;
   }
 
-  var cd = CostDistance.calculate(costRaster, sourceRaster, 5000);
-  console.log(cd);
+  costDistance = CostDistance.calculate(costRaster, sourceRaster, maxCost);
 
+  n=0;
+  for(row=0; row<size; row++){
+    for(col=0; col<size; col++){
+      data[4*n] = 255;
+      data[4*n + 1] = ((costDistance[row][col] || maxCost) / maxCost) * 255;
+      data[4*n + 2] = 255;
+      data[4*n + 3] = 255;
+      n++;
+    }
+  }
+
+  imageData.data = data;
 
   ctx.putImageData(imageData, 0, 0);
 }
@@ -157,7 +167,7 @@ map.on('click', function(evt) {
       yDiff = tileBounds[3] - tileBounds[1];
 
   pixel.x = Math.round(256 * (meters[0] - tileBounds[0]) / xDiff);
-  pixel.y = Math.round(256 * (meters[1] - tileBounds[1]) / xDiff);
+  pixel.y = 256 - Math.round(256 * (meters[1] - tileBounds[1]) / yDiff);
 
   var imageLayer = L.imageOverlay.canvas(L.latLngBounds([bounds[0], bounds[1]],[bounds[2], bounds[3]]));
 
