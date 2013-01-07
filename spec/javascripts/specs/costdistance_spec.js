@@ -1,11 +1,13 @@
 describe('costdistance.js', function() {
 
-  var costRaster = [
+  var cd = costDistance(),
+
+      costRaster = [
         [1, 3, 4, 4, 3, 2],
         [4, 6, 2, 3, 7, 6],
         [5, 8, 7, 5, 5, 6],
-        [1, 4, 5, CostDistance.NODATA, 5, 1],
-        [4, 7, 5, CostDistance.NODATA, 2, 6],
+        [1, 4, 5, cd.NODATA, 5, 1],
+        [4, 7, 5, cd.NODATA, 2, 6],
         [1, 2, 2, 1, 3, 4]
       ],
 
@@ -28,7 +30,7 @@ describe('costdistance.js', function() {
       ];
 
   describe('calculate', function() {
-    var cd = CostDistance.calculate(costRaster, sourceRaster);
+    var cdRaster = cd.calculate(costRaster, sourceRaster);
 
     it('should make the expected cost distance raster', function() {
       var r, c;
@@ -36,9 +38,9 @@ describe('costdistance.js', function() {
       for(r=0; r<expected.length; r++) {
         for(c=0; c<expected[r].length; c++) {
           if (isNaN(expected[r][c])) {
-            expect(isNaN(cd[r][c])).toBe(true);
+            expect(isNaN(cdRaster[r][c])).toBe(true);
           } else {
-            expect(cd[r][c]).toBe(expected[r][c]);
+            expect(cdRaster[r][c]).toBe(expected[r][c]);
           }
 
         }

@@ -202,15 +202,14 @@ MinHeap.prototype.size = function() {
   return this.heap.length;
 };
 
-var CostDistance = CostDistance || {};
+var costDistance = function(C) {
+  var self = {},
+      NODATA = -1;
 
-(function(C) {
-  C.NODATA = -1;
-
-  C._getCost = function(raster, r1, c1, r2, c2) {
+  self._getCost = function(raster, r1, c1, r2, c2) {
 
     // Handle NODATA
-    if (raster[r1][c1] === C.NODATA || raster[r2][c2] === C.NODATA) {
+    if (raster[r1][c1] === self.NODATA || raster[r2][c2] === self.NODATA) {
       return NaN;
     }
 
@@ -223,7 +222,7 @@ var CostDistance = CostDistance || {};
     }
   };
 
-  C.calculate = function(costRaster, sourceRaster, maxCost) {
+  self.calculate = function(costRaster, sourceRaster, maxCost) {
     var rowCnt = costRaster.length,
         colCnt = costRaster[0].length,
 
@@ -316,7 +315,7 @@ var CostDistance = CostDistance || {};
           if (row >= 0 && row < rowCnt &&
               col >= 0 && col < colCnt) {
 
-            curCost = C._getCost(costRaster, curCell.row, curCell.col, row, col);
+            curCost = self._getCost(costRaster, curCell.row, curCell.col, row, col);
 
             if (isNaN(curCost)) {
               costDistanceRaster[row][col] = NaN;
@@ -342,10 +341,10 @@ var CostDistance = CostDistance || {};
           }
         }
       }
-
-      // console.log(heap.size());
     }
 
     return costDistanceRaster;
   };
-})(CostDistance);
+
+  return self;
+};
