@@ -1,6 +1,6 @@
 
   var zoom = 16,
-      buffer = 400,
+      buffer = 800,
       tileSize = 256,
       gm = new GlobalMercator(),
       tileStitcher = tileStitcher('tiles/{z}/{x}/{y}.png', {scheme: 'tms'}),
@@ -11,7 +11,7 @@
       canvasLayer;
 
   map
-    .setView([39.9524, -75.1636], 16)
+    .setView([39.9524, -75.1636], 15)
     .addLayer(layer);
 
   function to2D(array1D, width) {
@@ -37,9 +37,9 @@
         frictionRaster = [],
         cdData = [],
         sourceRaster = to2D([], w),
-        maxCost = 2000,
+        maxCost = 4000,
         row, col, i, n,
-        red, green, blue, alpha, pixel,
+        red, green, blue, alpha, pixel, color,
         costDistance, cdImageData;
 
     mapCanvas.width = w;
@@ -55,7 +55,7 @@
       green = data[i + 1],
       blue = data[i + 2],
       alpha = data[i + 3],
-      pixel = (i / 4);
+      pixel = i / 4;
 
       if (pixel % w === 0) {
         row++;
@@ -72,10 +72,11 @@
     n=0;
     for(row=0; row<w; row++){
       for(col=0; col<h; col++){
+        color = ((costDistance[row][col] || maxCost) / maxCost) * 255,
         data[4*n] = 255;
-        data[4*n + 1] = ((costDistance[row][col] || maxCost) / maxCost) * 255;
+        data[4*n + 1] = color;
         data[4*n + 2] = 255;
-        data[4*n + 3] = 255;
+        data[4*n + 3] = 255; // color === 255 ? 0 : 255;
         n++;
       }
     }
