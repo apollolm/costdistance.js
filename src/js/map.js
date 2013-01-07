@@ -1,7 +1,8 @@
 
   var zoom = 16,
-      buffer = 800,
+      buffer = 200,
       tileSize = 256,
+      maxCost = 2000,
       gm = new GlobalMercator(),
       tileStitcher = tileStitcher('tiles/{z}/{x}/{y}.png', {scheme: 'tms'}),
       map = L.map('map'),
@@ -26,9 +27,8 @@
   }
 
   function draw(frictionCanvas, mapCanvas, sourcePixel) {
-    console.log(frictionCanvas, mapCanvas);
-
-    var mapCtx = mapCanvas.getContext('2d'),
+    var cd = costDistance(),
+        mapCtx = mapCanvas.getContext('2d'),
         frictionCtx = frictionCanvas.getContext('2d'),
         w = frictionCanvas.width,
         h = frictionCanvas.height,
@@ -37,13 +37,14 @@
         frictionRaster = [],
         cdData = [],
         sourceRaster = to2D([], w),
-        maxCost = 4000,
         row, col, i, n,
         red, green, blue, alpha, pixel, color,
-        costDistance, cdImageData;
+        costDistanceRaster, cdImageData;
 
     mapCanvas.width = w;
     mapCanvas.height = h;
+
+    console.log(sourcePixel.x, sourcePixel.y, w, h);
 
     // Init the source raster
     sourceRaster[sourcePixel.y][sourcePixel.x] = 1;
@@ -66,13 +67,13 @@
     }
 
     // Calculate the costdistance raster
-    costDistance = CostDistance.calculate(frictionRaster, sourceRaster, maxCost);
+    costDistanceRaster = cd.calculate(frictionRaster, sourceRaster, maxCost);
 
     // Turn cost into pixels to display
     n=0;
-    for(row=0; row<w; row++){
-      for(col=0; col<h; col++){
-        color = ((costDistance[row][col] || maxCost) / maxCost) * 255,
+    for(row=0; row<h; row++){
+      for(col=0; col<w; col++){
+        color = ((costDistanceRaster[row][col] || maxCost) / maxCost) * 255,
         data[4*n] = 255;
         data[4*n + 1] = color;
         data[4*n + 2] = 255;
@@ -112,7 +113,7 @@
         mergedSizeY = (neTile[1] - swTile[1] + 1) * tileSize;
 
     pixel.x = Math.round(mergedSizeX * (originMeters[0] - swTileBoundsMeters[0]) / xMetersDiff);
-    pixel.y = mergedSizeX - Math.round(mergedSizeX * (originMeters[1] - swTileBoundsMeters[1]) / yMetersDiff);
+    pixel.y = mergedSizeY - Math.round(mergedSizeY * (originMeters[1] - swTileBoundsMeters[1]) / yMetersDiff);
 
     // TODO: add setBounds() to canvas layer?
     if (canvasLayer) {

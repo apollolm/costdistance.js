@@ -36,6 +36,7 @@ var costDistance = function(C) {
     // Init the input raster to the size as the cost raster
     for (row=0, rlen=costRaster.length; row<rlen; row++) {
       costDistanceRaster[row] = [];
+      costDistanceRaster[row][colCnt-1] = undef;
     }
 
     // In the first iteration, the source cells are identified and assigned to zero
