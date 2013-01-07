@@ -1,10 +1,10 @@
 
-  var zoom = 16,
-      buffer = 200,
+  var zoom = 14,
+      buffer = 1600,
       tileSize = 256,
       maxCost = 2000,
       gm = new GlobalMercator(),
-      tileStitcher = tileStitcher('tiles/{z}/{x}/{y}.png', {scheme: 'tms'}),
+      tileStitcher = tileStitcher('tiles/{z}/{x}/{y}.png', {scheme:'tms'}),
       map = L.map('map'),
       layerUrl = 'http://{s}.tiles.mapbox.com/v3/atogle.map-vo4oycva/{z}/{x}/{y}.png',
       attribution = 'Map data &copy; OpenStreetMap contributors, CC-BY-SA <a href="http://mapbox.com/about/maps" target="_blank">Terms &amp; Feedback</a>',
@@ -44,8 +44,6 @@
     mapCanvas.width = w;
     mapCanvas.height = h;
 
-    console.log(sourcePixel.x, sourcePixel.y, w, h);
-
     // Init the source raster
     sourceRaster[sourcePixel.y][sourcePixel.x] = 1;
 
@@ -73,11 +71,19 @@
     n=0;
     for(row=0; row<h; row++){
       for(col=0; col<w; col++){
-        color = ((costDistanceRaster[row][col] || maxCost) / maxCost) * 255,
-        data[4*n] = 255;
-        data[4*n + 1] = color;
-        data[4*n + 2] = 255;
-        data[4*n + 3] = 255; // color === 255 ? 0 : 255;
+        // color = ((costDistanceRaster[row][col] || maxCost) / maxCost) * 255,
+        color = costDistanceRaster[row][col] === maxCost ? 0 : 255;
+        if (costDistanceRaster[row][col] === maxCost) {
+          data[4*n] = 0;
+          data[4*n + 1] = 0;
+          data[4*n + 2] = 0;
+          data[4*n + 3] = 255;
+        } else {
+          data[4*n] = 0;
+          data[4*n + 1] = 88;
+          data[4*n + 2] = 36;
+          data[4*n + 3] = 255 - (((costDistanceRaster[row][col] || maxCost) / maxCost) * 255);
+        }
         n++;
       }
     }
@@ -88,6 +94,7 @@
   }
 
   map.on('click', function(evt) {
+    // NOTE! this is TMS specific logic
     var originMeters = gm.LatLonToMeters(evt.latlng.lat, evt.latlng.lng),
         // Southwest, MinX/MinY Tile
         swTile = gm.MetersToTile(originMeters[0]-buffer, originMeters[1]-buffer, zoom),
@@ -104,8 +111,7 @@
         // mercTile = [tms[0], (Math.pow(2, zoom) - 1) - tms[1]],
         // url = 'tiles/'+zoom+'/'+tms[0]+'/'+tms[1]+'.png',
         costImageData = [],
-        pixel = {},
-        tx, ty, url;
+        pixel = {};
 
     var xMetersDiff = neTileBoundsMeters[2] - swTileBoundsMeters[0],
         yMetersDiff = neTileBoundsMeters[3] - swTileBoundsMeters[1],
