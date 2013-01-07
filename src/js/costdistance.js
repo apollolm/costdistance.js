@@ -1,12 +1,11 @@
-var CostDistance = CostDistance || {};
+var costDistance = function(C) {
+  var self = {},
+      NODATA = -1;
 
-(function(C) {
-  C.NODATA = -1;
-
-  C._getCost = function(raster, r1, c1, r2, c2) {
+  self._getCost = function(raster, r1, c1, r2, c2) {
 
     // Handle NODATA
-    if (raster[r1][c1] === C.NODATA || raster[r2][c2] === C.NODATA) {
+    if (raster[r1][c1] === self.NODATA || raster[r2][c2] === self.NODATA) {
       return NaN;
     }
 
@@ -19,7 +18,7 @@ var CostDistance = CostDistance || {};
     }
   };
 
-  C.calculate = function(costRaster, sourceRaster, maxCost) {
+  self.calculate = function(costRaster, sourceRaster, maxCost) {
     var rowCnt = costRaster.length,
         colCnt = costRaster[0].length,
 
@@ -34,13 +33,14 @@ var CostDistance = CostDistance || {};
         neighbor, row, col, rlen, clen,
         curCell, curCost, tempAccumCost;
 
+    // Init the input raster to the size as the cost raster
+    for (row=0, rlen=costRaster.length; row<rlen; row++) {
+      costDistanceRaster[row] = [];
+    }
+
     // In the first iteration, the source cells are identified and assigned to zero
     // since there is no accumulative cost to return to themselves.
     for (row=0, rlen=sourceRaster.length; row<rlen; row++) {
-
-      // Init the input raster to the size as the source
-      costDistanceRaster[row] = [];
-
       for (col=0, clen=sourceRaster[row].length; col<clen; col++) {
         if (sourceRaster[row][col] > 0) {
           costDistanceRaster[row][col] = 0;
@@ -111,7 +111,7 @@ var CostDistance = CostDistance || {};
           if (row >= 0 && row < rowCnt &&
               col >= 0 && col < colCnt) {
 
-            curCost = C._getCost(costRaster, curCell.row, curCell.col, row, col);
+            curCost = self._getCost(costRaster, curCell.row, curCell.col, row, col);
 
             if (isNaN(curCost)) {
               costDistanceRaster[row][col] = NaN;
@@ -143,4 +143,6 @@ var CostDistance = CostDistance || {};
 
     return costDistanceRaster;
   };
-})(CostDistance);
+
+  return self;
+};
