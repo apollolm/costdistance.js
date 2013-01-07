@@ -34,13 +34,14 @@ var CostDistance = CostDistance || {};
         neighbor, row, col, rlen, clen,
         curCell, curCost, tempAccumCost;
 
+    // Init the input raster to the size as the cost raster
+    for (row=0, rlen=costRaster.length; row<rlen; row++) {
+      costDistanceRaster[row] = [];
+    }
+
     // In the first iteration, the source cells are identified and assigned to zero
     // since there is no accumulative cost to return to themselves.
     for (row=0, rlen=sourceRaster.length; row<rlen; row++) {
-
-      // Init the input raster to the size as the source
-      costDistanceRaster[row] = [];
-
       for (col=0, clen=sourceRaster[row].length; col<clen; col++) {
         if (sourceRaster[row][col] > 0) {
           costDistanceRaster[row][col] = 0;
