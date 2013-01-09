@@ -2,7 +2,7 @@
   var zoom = 14,
       buffer = 1600,
       tileSize = 256,
-      maxCost = 2000,
+      maxCost = 1600,
       gm = new GlobalMercator(),
       tileStitcher = tileStitcher('tiles/{z}/{x}/{y}.png', {scheme:'tms'}),
       map = L.map('map'),
